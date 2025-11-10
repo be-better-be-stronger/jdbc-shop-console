@@ -1,0 +1,19 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ
+.idea/
+*.iml
+
+# Build output
+/target/
+bin/
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
