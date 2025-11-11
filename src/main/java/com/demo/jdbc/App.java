@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.demo.jdbc.model.Category;
+import com.demo.jdbc.model.Customer;
 import com.demo.jdbc.model.Order;
 import com.demo.jdbc.model.OrderItem;
 import com.demo.jdbc.model.Product;
@@ -63,22 +65,23 @@ public class App {
             String choice = sc.nextLine();
             switch (choice) {
                 case "1" -> catService.findAll().forEach(System.out::println);
-                case "2" -> {
-                    System.out.print("Tên danh mục: ");
-                    String name = sc.nextLine();
-                    System.out.println("Đã thêm: " + catService.create(name));
+                case "2" -> {                   
+                    	System.out.print("Tên danh mục: ");
+                        String name = sc.nextLine();
+                        Category newCategory = catService.create(name);
+                        if(newCategory != null) System.out.println("Đã thêm: " +  newCategory);				
                 }
                 case "3" -> {
                     System.out.print("ID cần sửa: ");
                     int id = Integer.parseInt(sc.nextLine());
                     System.out.print("Tên mới: ");
                     String name = sc.nextLine();
-                    System.out.println(catService.update(id, name) ? "Sửa thành công!" : "Không tìm thấy ID!");
+                    System.out.println(catService.update(id, name) ? "Sửa thành công!" : "Sửa thất bại!");
                 }
                 case "4" -> {
                     System.out.print("ID cần xóa: ");
                     int id = Integer.parseInt(sc.nextLine());
-                    System.out.println(catService.delete(id) ? "Đã xóa!" : "Không tìm thấy ID!");
+                    System.out.println(catService.delete(id) ? "Đã xóa!" : "Thất bại!");
                 }
                 case "0" -> { return; }
                 default -> System.out.println("Sai lựa chọn!");
@@ -104,7 +107,8 @@ public class App {
                     String name = sc.nextLine();
                     System.out.print("Email: ");
                     String email = sc.nextLine();
-                    System.out.println("Đã thêm: " + cusService.create(name, email));
+                    Customer newCustomer = cusService.create(name, email);
+                    if(cusService != null) System.out.println("Đã thêm: " + newCustomer);
                 }
                 case "3" -> {
                     System.out.print("ID cần sửa: ");
@@ -113,12 +117,12 @@ public class App {
                     String name = sc.nextLine();
                     System.out.print("Email mới: ");
                     String email = sc.nextLine();
-                    System.out.println(cusService.update(id, name, email) ? "Sửa thành công!" : "Không tìm thấy ID!");
+                    System.out.println(cusService.update(id, name, email) ? "Cập nhật thành công!" : "Cập nhật thất bại!");
                 }
                 case "4" -> {
                     System.out.print("ID cần xóa: ");
                     int id = Integer.parseInt(sc.nextLine());
-                    System.out.println(cusService.delete(id) ? "Đã xóa!" : "Không tìm thấy ID!");
+                    System.out.println(cusService.delete(id) ? "Đã xóa!" : "Thất bại!");
                 }
                 case "0" -> { return; }
                 default -> System.out.println("Sai lựa chọn!");
@@ -162,12 +166,12 @@ public class App {
                     int qty = Integer.parseInt(sc.nextLine());
                     System.out.print("ID danh mục mới: ");
                     int catId = Integer.parseInt(sc.nextLine());
-                    System.out.println(proService.update(id, name, price, qty, catId) ? "Cập nhật thành công!" : "Không tìm thấy ID!");
+                    System.out.println(proService.update(id, name, price, qty, catId) ? "Cập nhật thành công!" : "Cập nhật thất bại!");
                 }
                 case "4" -> {
                     System.out.print("ID cần xóa: ");
                     int id = Integer.parseInt(sc.nextLine());
-                    System.out.println(proService.delete(id) ? "Đã xóa!" : "Không tìm thấy ID!");
+                    System.out.println(proService.delete(id) ? "Đã xóa!" : "Thất bại!");
                 }
                 case "5" -> {
                     System.out.print("Nhập ID danh mục: ");

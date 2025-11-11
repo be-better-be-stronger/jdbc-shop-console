@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.demo.jdbc.dao.ProductDao;
 import com.demo.jdbc.model.Category;
 import com.demo.jdbc.model.Product;
-import com.demo.jdbc.util.DB;
+import com.demo.jdbc.util.TransactionManager;
 
 public class ProductDaoImpl implements ProductDao{
 	private static final Logger log = LoggerFactory.getLogger(ProductDaoImpl.class.getName());
@@ -41,7 +41,7 @@ public class ProductDaoImpl implements ProductDao{
 	            ORDER BY p.id
 	        """;
 	        List<Product> list = new ArrayList<>();
-	        try (Connection cn = DB.getConnection();
+	        try (Connection cn = TransactionManager.getConnection();
 	             PreparedStatement ps = cn.prepareStatement(sql);
 	             ResultSet rs = ps.executeQuery()) {
 	            while (rs.next()) list.add(map(rs));
@@ -60,33 +60,37 @@ public class ProductDaoImpl implements ProductDao{
 	            JOIN categories c ON p.category_id = c.id
 	            WHERE p.id=?
 	        """;
-	        try (Connection cn = DB.getConnection();
-	             PreparedStatement ps = cn.prepareStatement(sql)) {
+		try {
+			Connection cn = TransactionManager.getConnection();
+			try (PreparedStatement ps = cn.prepareStatement(sql)) {
 	            ps.setInt(1, id);
 	            try (ResultSet rs = ps.executeQuery()) {
 	                if (rs.next()) return Optional.of(map(rs));
 	            }
-	        } catch (Exception e) {
+			}
+			return Optional.empty();
+		} catch (Exception e) {
 	            throw new RuntimeException("Find product failed", e);
-	        }
-	        return Optional.empty();
+	    }	    
 	}
 
 	@Override
 	public Product insert(Product p) {
 		String sql = "INSERT INTO products(name, price, quantity, category_id) VALUES(?, ?, ?, ?)";
-        try (Connection cn = DB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, p.getName());
-            ps.setBigDecimal(2, p.getPrice());
-            ps.setInt(3, p.getQuantity());
-            ps.setInt(4, p.getCategory().getId());
-            ps.executeUpdate();
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) p.setId(rs.getInt(1));
+        try {
+        	Connection cn = TransactionManager.getConnection();
+        	try (PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, p.getName());
+                ps.setBigDecimal(2, p.getPrice());
+                ps.setInt(3, p.getQuantity());
+                ps.setInt(4, p.getCategory().getId());
+                ps.executeUpdate();
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) p.setId(rs.getInt(1));
+                }
+                return p;
             }
-            return p;
-        } catch (Exception e) {
+        }catch (Exception e) {
             throw new RuntimeException("Insert product failed", e);
         }
 	}
@@ -109,11 +113,13 @@ public class ProductDaoImpl implements ProductDao{
 	@Override
 	public boolean deleteById(int id) {
 		String sql = "DELETE FROM products WHERE id=?";
-        try (Connection cn = DB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
+		try {
+			Connection cn = TransactionManager.getConnection();
+			try (PreparedStatement ps = cn.prepareStatement(sql)) {
+	            ps.setInt(1, id);
+	            return ps.executeUpdate() > 0;
+	        }
+		}catch (Exception e) {
             throw new RuntimeException("Delete product failed", e);
         }
 	}
@@ -128,12 +134,14 @@ public class ProductDaoImpl implements ProductDao{
 	            WHERE c.id=?
 	        """;
 	        List<Product> list = new ArrayList<>();
-	        try (Connection cn = DB.getConnection();
-	             PreparedStatement ps = cn.prepareStatement(sql)) {
-	            ps.setInt(1, categoryId);
-	            try (ResultSet rs = ps.executeQuery()) {
-	                while (rs.next()) list.add(map(rs));
-	            }
+	        try {
+	        	Connection cn = TransactionManager.getConnection();
+	        	 try (PreparedStatement ps = cn.prepareStatement(sql)) {
+	 	            ps.setInt(1, categoryId);
+	 	            try (ResultSet rs = ps.executeQuery()) {
+	 	                while (rs.next()) list.add(map(rs));
+	 	            }
+	 	        } 
 	        } catch (Exception e) {
 	            throw new RuntimeException("Find products by category failed", e);
 	        }
@@ -143,19 +151,21 @@ public class ProductDaoImpl implements ProductDao{
 	@Override
 	public boolean existsInOrderItems(int productId) {
 		String sql = "SELECT COUNT(*) FROM order_items WHERE product_id=?";
-	    try (Connection cn = DB.getConnection();
-	         PreparedStatement ps = cn.prepareStatement(sql)) {
-	        ps.setInt(1, productId);
-	        log.debug("Checking if product {} exists in order_items", productId);
-	        try (ResultSet rs = ps.executeQuery()) {
-	            if (rs.next()) {
-	            	int count = rs.getInt(1);
-	            	boolean exists = count > 0;
-	            	log.debug("Product {} exists in order_items: {} ({} records found)", 
-	            			productId, exists, count);
-	            	return exists;
-	            }
-	        }
+	    try {
+	    	Connection cn = TransactionManager.getConnection();
+	    	try (PreparedStatement ps = cn.prepareStatement(sql)) {
+		        ps.setInt(1, productId);
+		        log.debug("Checking if product {} exists in order_items", productId);
+		        try (ResultSet rs = ps.executeQuery()) {
+		            if (rs.next()) {
+		            	int count = rs.getInt(1);
+		            	boolean exists = count > 0;
+		            	log.debug("Product {} exists in order_items: {} ({} records found)", 
+		            			productId, exists, count);
+		            	return exists;
+		            }
+		        }
+		    }	    	
 	    } catch (SQLException e) {
             log.error("SQL error while checking product usage (productId={})", productId, e);
             throw new RuntimeException("Database error when checking product usage", e);
