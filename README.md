@@ -164,7 +164,7 @@ Trần Thị B                      1          540,000.00
 ---
 
 ## 🧑‍💻 Author
-**Đặng Quốc Thanh - dangquocthanh.la@gmail.com** 
+**Đặng Quốc Thanh - dangquocthanh.la@gmail.com**  
 🎓 FPT Polytechnic Alumni  
 💻 Java Web Fullstack Developer  
 🌐 [GitHub Profile](https://github.com/be-better-be-stronger)
@@ -190,5 +190,5 @@ If this project helps you learn JDBC faster:
 ⭐ **Give it a star** & share it to inspire other Java learners!
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/<your-username>/jdbc-shop-console?style=social" />
+  <img src="https://img.shields.io/github/stars/be-better-be-stronger/jdbc-shop-console?style=social" />
 </p>
