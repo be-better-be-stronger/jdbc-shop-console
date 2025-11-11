@@ -126,6 +126,33 @@ mvn clean compile exec:java -Dexec.mainClass="com.demo.jdbc.App"
 5. Reports
 0. Exit
 
+-- Manage Categories --
+1. View all
+2. Create new
+3. Update
+4. Delete
+0. Return
+
+-- Manage Customers --
+1. View all
+2. Create new
+3. Update
+4. Delete
+0. Return
+
+-- Manage Products --
+1. View all
+2. Create new
+3. Update
+4. Delete
+5. Group by category
+0. Return
+
+-- Manage Orders --
+1. Create new order
+2. Order details
+0. Return
+
 -- Reports --
 1. Revenue by Product
 2. Revenue by Customer
