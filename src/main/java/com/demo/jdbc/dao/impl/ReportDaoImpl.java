@@ -3,6 +3,7 @@ package com.demo.jdbc.dao.impl;
 import com.demo.jdbc.dao.ReportDao;
 import com.demo.jdbc.model.Report;
 import com.demo.jdbc.util.DB;
+import com.demo.jdbc.util.TransactionManager;
 
 import java.sql.*;
 import java.util.*;
@@ -40,17 +41,20 @@ public class ReportDaoImpl implements ReportDao {
     // helper
     private List<Report> queryReport(String sql) {
         List<Report> list = new ArrayList<>();
-        try (Connection cn = DB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Report(
-                    rs.getString("name"),
-                    rs.getLong("quantity"),
-                    rs.getBigDecimal("revenue")
-                ));
-            }
-        } catch (Exception e) {
+        try {
+        	Connection cn = TransactionManager.getConnection();
+        	try (
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery()) {
+                   while (rs.next()) {
+                       list.add(new Report(
+                           rs.getString("name"),
+                           rs.getLong("quantity"),
+                           rs.getBigDecimal("revenue")
+                       ));
+                   }
+               }
+        }catch (Exception e) {
             throw new RuntimeException("Query report failed", e);
         }
         return list;

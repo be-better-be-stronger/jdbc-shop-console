@@ -18,7 +18,6 @@ import com.demo.jdbc.model.Order;
 import com.demo.jdbc.model.OrderItem;
 import com.demo.jdbc.model.Product;
 import com.demo.jdbc.service.OrderService;
-import com.demo.jdbc.util.DB;
 import com.demo.jdbc.util.TransactionManager;
 
 public class OrderServiceImpl implements OrderService {
@@ -83,8 +82,9 @@ public class OrderServiceImpl implements OrderService {
 
 		} catch (Exception e) {
 			TransactionManager.rollback();
-			throw new RuntimeException("Tạo đơn hàng thất bại: " + e.getMessage(), e);
+			handleError(e, "tạo đơn hàng");
 		}
+		return null;
 	}
 
 	@Override
@@ -92,4 +92,7 @@ public class OrderServiceImpl implements OrderService {
 		return orderDao.findAllWithDetails();
 	}
 
+	private  void handleError(Exception e, String action) {        
+        System.err.println("Lỗi khi " + action + ": " + e.getMessage());
+	}
 }
