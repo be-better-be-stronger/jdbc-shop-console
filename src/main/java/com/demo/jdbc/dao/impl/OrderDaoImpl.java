@@ -15,6 +15,7 @@ import com.demo.jdbc.model.Order;
 import com.demo.jdbc.model.OrderItem;
 import com.demo.jdbc.model.Product;
 import com.demo.jdbc.util.DB;
+import com.demo.jdbc.util.TransactionManager;
 
 public class OrderDaoImpl implements OrderDao {
 
@@ -44,13 +45,22 @@ public class OrderDaoImpl implements OrderDao {
 	            JOIN customers c ON o.customer_id = c.id
 	            WHERE o.id=?
 	        """;
-	        try (Connection cn = DB.getConnection();
+	        try (Connection cn = TransactionManager.getConnection();
 	             PreparedStatement ps = cn.prepareStatement(sql)) {
 	            ps.setInt(1, id);
 	            try (ResultSet rs = ps.executeQuery()) {
 	                if (rs.next()) {
-	                    Customer cus = new Customer(rs.getInt("c_id"), rs.getString("c_name"), rs.getString("c_email"));
-	                    Order order = new Order(rs.getInt("id"), cus, rs.getTimestamp("order_date").toLocalDateTime(), rs.getBigDecimal("total"));
+	                    Customer cus = new Customer(
+	                    		rs.getInt("c_id"), 
+	                    		rs.getString("c_name"), 
+	                    		rs.getString("c_email")
+	                    		);
+	                    Order order = new Order(
+	                    		rs.getInt("id"), 
+	                    		cus, 
+	                    		rs.getTimestamp("order_date").toLocalDateTime(), 
+	                    		rs.getBigDecimal("total")
+	                    		);
 	                    return Optional.of(order);
 	                }
 	            }
@@ -74,7 +84,7 @@ public class OrderDaoImpl implements OrderDao {
 		        ORDER BY o.id, oi.id
 		    """;
 		    List<Order> orders = new ArrayList<>();
-		    try (Connection cn = DB.getConnection();
+		    try (Connection cn = TransactionManager.getConnection();
 		         PreparedStatement ps = cn.prepareStatement(sql);
 		         ResultSet rs = ps.executeQuery()) {
 

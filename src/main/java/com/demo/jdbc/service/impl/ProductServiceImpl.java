@@ -10,10 +10,8 @@ import com.demo.jdbc.dao.ProductDao;
 import com.demo.jdbc.dao.impl.CategoryDaoImpl;
 import com.demo.jdbc.dao.impl.ProductDaoImpl;
 import com.demo.jdbc.model.Category;
-import com.demo.jdbc.model.Customer;
 import com.demo.jdbc.model.Product;
 import com.demo.jdbc.service.ProductService;
-import com.demo.jdbc.util.DB;
 import com.demo.jdbc.util.TransactionManager;
 
 public class ProductServiceImpl implements ProductService {

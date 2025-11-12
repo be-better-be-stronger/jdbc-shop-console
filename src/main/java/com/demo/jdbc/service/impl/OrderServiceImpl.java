@@ -19,6 +19,7 @@ import com.demo.jdbc.model.OrderItem;
 import com.demo.jdbc.model.Product;
 import com.demo.jdbc.service.OrderService;
 import com.demo.jdbc.util.DB;
+import com.demo.jdbc.util.TransactionManager;
 
 public class OrderServiceImpl implements OrderService {
 	private final CustomerDao customerDao = new CustomerDaoImpl();
@@ -28,8 +29,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order createOrder(int customerId, List<OrderItem> items) {
-		try (Connection cn = DB.getConnection()) {
-			cn.setAutoCommit(false); // Bắt đầu transaction
+		try {
+			TransactionManager.begin();
+			Connection cn = TransactionManager.getConnection();
 
 			Customer cus = customerDao.findById(customerId)
 					.orElseThrow(() -> new IllegalArgumentException("Khách hàng không tồn tại"));
@@ -41,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
 						.orElseThrow(() -> new IllegalArgumentException("Sản phẩm không tồn tại"));
 				if (p.getQuantity() < i.getQuantity()) {
 					cn.rollback();
-					throw new IllegalStateException("Sản phẩm " + p.getName() + " không đủ hàng");
+					throw new IllegalStateException(String.format("Sản phẩm %s không đủ hàng", p.getName()));
 				}
 				i.setProduct(p);
 				i.setPrice(p.getPrice());
@@ -71,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
 				productDao.update(cn, p);
 			}
 
-			cn.commit(); // ✅ Thành công
+			TransactionManager.commit(); // ✅ Thành công
 
 			order.setItems(items);
 
@@ -80,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
 			return order;
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			TransactionManager.rollback();
 			throw new RuntimeException("Tạo đơn hàng thất bại: " + e.getMessage(), e);
 		}
 	}
