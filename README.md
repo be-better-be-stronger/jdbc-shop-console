@@ -25,13 +25,13 @@ It contains 5 related tables — `categories`, `customers`, `products`, `orders`
 ```sql
 CREATE TABLE categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL
+  name VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE customers (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  email VARCHAR(100) NOT NULL
+  email VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE products (
