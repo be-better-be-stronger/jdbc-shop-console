@@ -25,21 +25,21 @@ It contains 5 related tables — `categories`, `customers`, `products`, `orders`
 ```sql
 CREATE TABLE categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100)
+  name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE customers (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100),
-  email VARCHAR(100)
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE products (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100),
-  price DECIMAL(10,2),
-  quantity INT,
-  category_id INT,
+  name VARCHAR(100) NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  quantity INT NOT NULL,
+  category_id INT NOT NULL,
   FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
@@ -53,10 +53,10 @@ CREATE TABLE orders (
 
 CREATE TABLE order_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  order_id INT,
-  product_id INT,
-  quantity INT,
-  price DECIMAL(10,2),
+  order_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
   FOREIGN KEY (order_id) REFERENCES orders(id),
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
