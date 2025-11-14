@@ -24,6 +24,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             return productDao.findAll();
         } catch (Exception e) {
+        	e.printStackTrace();
             handleError(e, "tải danh sách sản phẩm");
             return List.of();
         }
@@ -133,6 +134,5 @@ public class ProductServiceImpl implements ProductService {
         if(categoryId <= 0)
         	throw new IllegalArgumentException("Id danh mục không hợp lệ");
     }
-    
-    
+
 }

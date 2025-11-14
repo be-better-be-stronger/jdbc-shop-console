@@ -84,4 +84,5 @@ public interface ProductService {
      * @return {@code true} if the product was successfully deleted; {@code false} if not found.
      */
     boolean delete(int id);
+ 
 }

@@ -13,6 +13,7 @@ import com.demo.jdbc.dao.impl.CustomerDaoImpl;
 import com.demo.jdbc.dao.impl.OrderDaoImpl;
 import com.demo.jdbc.dao.impl.OrderItemDaoImpl;
 import com.demo.jdbc.dao.impl.ProductDaoImpl;
+import com.demo.jdbc.exception.EntityNotFoundException;
 import com.demo.jdbc.model.Customer;
 import com.demo.jdbc.model.Order;
 import com.demo.jdbc.model.OrderItem;
@@ -33,13 +34,13 @@ public class OrderServiceImpl implements OrderService {
 			Connection cn = TransactionManager.getConnection();
 
 			Customer cus = customerDao.findById(customerId)
-					.orElseThrow(() -> new IllegalArgumentException("Khách hàng không tồn tại"));
+					.orElseThrow(() -> new EntityNotFoundException(String.format("Khách hàng có id=%d không tồn tại", customerId)));
 
 			// Tính tổng tiền & kiểm tra tồn kho
 			BigDecimal total = BigDecimal.ZERO;
 			for (OrderItem i : items) {
 				Product p = productDao.findById(i.getProduct().getId())
-						.orElseThrow(() -> new IllegalArgumentException("Sản phẩm không tồn tại"));
+						.orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
 				if (p.getQuantity() < i.getQuantity()) {
 					cn.rollback();
 					throw new IllegalStateException(String.format("Sản phẩm %s không đủ hàng", p.getName()));
@@ -74,10 +75,7 @@ public class OrderServiceImpl implements OrderService {
 
 			TransactionManager.commit(); // ✅ Thành công
 
-			order.setItems(items);
-
-			System.out.println("Đã tạo đơn hàng #" + order.getId() + " - Tổng tiền: " + total + " - Ngày: "
-					+ order.getOrderDate());
+			order.setItems(items);			
 			return order;
 
 		} catch (Exception e) {
@@ -89,7 +87,12 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<Order> findAllWithDetails() {
-		return orderDao.findAllWithDetails();
+		try {
+			return orderDao.findAllWithDetails();
+		} catch (Exception e) {
+			handleError(e, "xem chi tiết hóa đơn");
+		}
+		return List.of();
 	}
 
 	private  void handleError(Exception e, String action) {        
